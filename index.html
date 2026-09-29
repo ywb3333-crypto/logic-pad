@@ -146,6 +146,8 @@ textarea{flex:1;min-width:0;min-height:calc(var(--lh) * 16 + 28px);resize:none;b
       <div class="bar-left lines">
         <button type="button" id="openSub" class="sub">│ 가정 열기</button>
         <button type="button" id="closeSub" class="sub">가정 닫기</button>
+        <button type="button" id="splitBr" class="sub">⑂ 가지 나누기</button>
+        <button type="button" id="closeBr" class="sub">× 가지 닫기</button>
         <button type="button" id="insAbove">↑ 위에 줄 넣기</button>
         <button type="button" id="insBelow">↓ 아래에 줄 넣기</button>
         <button type="button" id="delLine">줄 지우기</button>
@@ -168,7 +170,7 @@ textarea{flex:1;min-width:0;min-height:calc(var(--lh) * 16 + 28px);resize:none;b
     <div class="toast" id="toast" role="status"></div>
   </div>
   <div class="dock" id="dock" aria-label="자주 쓰는 기호"><div class="dock-in" id="dockIn"></div></div>
-  <div class="hint">가정 열기: 가정선을 한 칸 더 긋고 가정 밑줄을 달아요. 가정을 쓰고 엔터를 치면 밑줄 아래로 넘어가요. · 엔터를 치면 가정선이 다음 줄에도 이어져요. · 가정 닫기: 가정선을 한 칸 빼요. 줄 맨 앞에서 ⌫를 눌러도 한 칸 빠져요. · 정당화: 왼쪽 줄 번호를 끌어다 오른쪽 정당화 칸에 놓으면 번호 칸이 들어가고, 그 뒤에 이어서 쓸 수 있어요. 정당화 칸을 먼저 누르고 줄 번호를 톡 눌러도 들어가요. 범위(3–10)는 줄 번호를 누른 채 번호 칸을 따라 위아래로 훑은 다음 정당화 칸으로 끌어오면 돼요. 번호 칸 바로 뒤에 "–"를 쓰고 다른 번호를 넣어도 범위로 합쳐져요. 줄을 넣거나 지우면 번호 칸의 숫자도 따라 바뀌어요. 번호 칸에 마우스를 올리거나 누르면 그 줄이 색칠돼요. 정당화 칸에서 엔터를 치면 다음 줄 정당화로 넘어가요. · 기호로 바뀐 직후 ⌫를 누르면 원래 글자로 돌아가요.</div>
+  <div class="hint">가정 열기: 가정선을 한 칸 더 긋고 가정 밑줄을 달아요. 가정을 쓰고 엔터를 치면 밑줄 아래로 넘어가요. · 엔터를 치면 가정선이 다음 줄에도 이어져요. · 가정 닫기: 가정선을 한 칸 빼요. 줄 맨 앞에서 ⌫를 눌러도 한 칸 빠져요. · 가지 나누기: ∨, ¬∧, → 처럼 가지가 갈리는 규칙을 쓸 줄에서 누르면 "가지 1", "가지 2" 칸이 아래로 이어서 생겨요. 가지 안에서 또 나누면 2.1, 2.2처럼 번호가 붙어요. 가지 닫기: ×를 넣고 다음 가지로 넘어가요. × 줄의 정당화 칸에 부딪힌 두 줄의 번호를 넣으세요. · ∧, ∨ 앞뒤 띄어쓰기는 그 줄을 벗어날 때(엔터, 다른 곳 누르기) 자동으로 맞춰져요. · 정당화: 왼쪽 줄 번호를 끌어다 오른쪽 정당화 칸에 놓으면 번호 칸이 들어가고, 그 뒤에 이어서 쓸 수 있어요. 정당화 칸을 먼저 누르고 줄 번호를 톡 눌러도 들어가요. 범위(3–10)는 줄 번호를 누른 채 번호 칸을 따라 위아래로 훑은 다음 정당화 칸으로 끌어오면 돼요. 번호 칸 바로 뒤에 "–"를 쓰고 다른 번호를 넣어도 범위로 합쳐져요. 줄을 넣거나 지우면 번호 칸의 숫자도 따라 바뀌어요. 번호 칸에 마우스를 올리거나 누르면 그 줄이 색칠돼요. 정당화 칸에서 엔터를 치면 다음 줄 정당화로 넘어가요. · 기호로 바뀐 직후 ⌫를 누르면 원래 글자로 돌아가요.</div>
 
   <section class="ref">
     <h2>단축 입력</h2>
@@ -243,8 +245,10 @@ function parse(line){
   while(line.startsWith(BAR, i)){ d++; i += BAR.length; }
   if(line.startsWith("│", i) && i + 1 === line.length){ d++; i += 1; }
   const rest = line.slice(i);
-  const sep = rest.startsWith("├") || /^─{2,}/.test(rest);
-  return {depth:d, prefixLen:i, rest, sep};
+  const branch = /^─+\s*가지/.test(rest);
+  const sep = !branch && (rest.startsWith("├") || /^─{2,}\s*$/.test(rest));
+  const close = /^×/.test(rest.trim());
+  return {depth:d, prefixLen:i, rest, sep, branch, close};
 }
 /* depth that new content lines under this line should have */
 function contentDepth(p){ return p.sep ? p.depth + 1 : p.depth; }
@@ -255,7 +259,7 @@ function numbers(lines){
   const out = []; let n = 0;
   for(const l of lines){
     const p = parse(l);
-    if(p.sep || (skipBlank.checked && p.rest.trim()==="")){ out.push(""); }
+    if(p.sep || p.branch || p.close || (skipBlank.checked && p.rest.trim()==="")){ out.push(""); }
     else { n++; out.push(String(n)); }
   }
   return out;
@@ -308,7 +312,8 @@ function render(){
     lines.forEach((l,i)=>{
       const c = document.createElement("div");
       c.className = "jcell"; c.dataset.id = ids[i];
-      if(parse(l).sep){ c.classList.add("sep"); }
+      const pl = parse(l);
+      if(pl.sep || pl.branch){ c.classList.add("sep"); }
       else { c.contentEditable = "true"; c.spellcheck = false; fillCell(c, just[ids[i]] || [], labels); }
       jf.appendChild(c);
     });
@@ -320,6 +325,35 @@ function render(){
 function markCur(){
   const cur = curLineIndex();
   [...gutter.children].forEach((d,i)=>d.classList.toggle("cur", i===cur));
+  trackLine();
+}
+let lastLineId = null;
+function tidy(text){
+  const p = parse(text);
+  if(p.sep || p.branch) return text;
+  let body = p.rest.replace(/[ \t]*([∧∨])[ \t]*/g, " $1 ");
+  body = body.replace(/^ ([∧∨])/, "$1").replace(/([∧∨]) +$/, "$1");
+  return text.slice(0, p.prefixLen) + body;
+}
+function tidyById(id){
+  const idx = ids.indexOf(id);
+  if(idx < 0) return false;
+  const lines = pad.value.split("\n");
+  const t = lines[idx], n = tidy(t);
+  if(n === t) return false;
+  let start = 0; for(let i = 0; i < idx; i++) start += lines[i].length + 1;
+  pad.setRangeText(n, start, start + t.length, "preserve");
+  return true;
+}
+function trackLine(){
+  if(composing) return;
+  const id = ids[curLineIndex()];
+  if(lastLineId && lastLineId !== id){
+    const prev = lastLineId; lastLineId = id;
+    if(tidyById(prev)){ prevLines = pad.value.split("\n").length; save(); render(); }
+    return;
+  }
+  lastLineId = id;
 }
 
 /* ---------- storage / ui helpers ---------- */
@@ -353,7 +387,7 @@ function flash(msg){
   toast.textContent = msg; toast.classList.add("on");
   clearTimeout(flash.t); flash.t = setTimeout(()=>toast.classList.remove("on"),1400);
 }
-function changed(){ prevLines = pad.value.split("\n").length; save(); render(); }
+function changed(){ prevLines = pad.value.split("\n").length; save(); render(); trackLine(); }
 
 function insert(text){
   const a = document.activeElement;
@@ -362,7 +396,6 @@ function insert(text){
     readCell(a); save(); return;
   }
   const s = pad.selectionStart, e = pad.selectionEnd;
-  if(SPACED.has(text) && pad.value[e] !== " ") text += " ";
   pad.setRangeText(text, s, e, "end");
   last = null; pad.focus(); changed();
 }
@@ -435,7 +468,46 @@ function handleEnter(){
   pad.setRangeText("\n" + prefix, s, e, "end");
   return true;
 }
-[["openSub",openSub],["closeSub",closeSub],["insAbove",()=>insLine(false)],["insBelow",()=>insLine(true)],["delLine",delLine]].forEach(([id,fn])=>{
+/* ---------- tableau branches, written one after another ---------- */
+function branchLabelAbove(idx){
+  const lines = pad.value.split("\n");
+  for(let i = idx; i >= 0; i--){
+    const m = parse(lines[i]).rest.match(/^─+\s*가지\s*([\d.]+)/);
+    if(m) return m[1];
+  }
+  return null;
+}
+function splitBranch(){
+  const L = lineAt(), p = parse(L.text);
+  const base = branchLabelAbove(curLineIndex());
+  const a = base ? base + ".1" : "1", b = base ? base + ".2" : "2";
+  const pre = bars(contentDepth(p));
+  const H = n => pre + "── 가지 " + n + " ──";
+  const txt = "\n" + H(a) + "\n" + pre + "\n" + H(b) + "\n" + pre;
+  pad.setRangeText(txt, L.end, L.end);
+  place(L.end + 1 + H(a).length + 1 + pre.length);
+  last = null; pad.focus(); changed();
+}
+function closeBranch(){
+  const L = lineAt(), p = parse(L.text);
+  const pre = bars(p.branch ? p.depth : contentDepth(p));
+  let at, txt;
+  if(!p.sep && !p.branch && p.rest.trim() === ""){ txt = pre + "×"; pad.setRangeText(txt, L.start, L.end); at = L.start + txt.length; }
+  else { txt = "\n" + pre + "×"; pad.setRangeText(txt, L.end, L.end); at = L.end + txt.length; }
+  /* hop to the next branch's first line if one follows */
+  const v = pad.value;
+  let ne = v.indexOf("\n", at);
+  if(ne !== -1){
+    let ne2 = v.indexOf("\n", ne + 1); if(ne2 === -1) ne2 = v.length;
+    if(parse(v.slice(ne + 1, ne2)).branch && ne2 < v.length){
+      let ne3 = v.indexOf("\n", ne2 + 1); if(ne3 === -1) ne3 = v.length;
+      at = ne3;
+    }
+  }
+  place(at);
+  last = null; pad.focus(); changed();
+}
+[["splitBr",splitBranch],["closeBr",closeBranch],["openSub",openSub],["closeSub",closeSub],["insAbove",()=>insLine(false)],["insBelow",()=>insLine(true)],["delLine",delLine]].forEach(([id,fn])=>{
   const b = document.getElementById(id);
   b.addEventListener("mousedown", e=>e.preventDefault());
   b.addEventListener("click", fn);
@@ -500,7 +572,7 @@ pad.addEventListener("input", ev=>{
   for(const [from,to] of MATCH){
     if(before.endsWith(from)){
       const start = pos - from.length;
-      const out = SPACED.has(to) && pad.value[pos] !== " " ? to + " " : to;
+      const out = to;
       pad.setRangeText(out, start, pos, "end");
       last = {start, from, to: out};
       break;
@@ -537,6 +609,7 @@ pad.addEventListener("keydown", ev=>{
 });
 ["click","keyup","select","focus"].forEach(t=>pad.addEventListener(t, markCur));
 pad.addEventListener("click", ()=>{ last = null; });
+pad.addEventListener("blur", ()=>{ if(lastLineId && tidyById(lastLineId)){ prevLines = pad.value.split("\n").length; save(); render(); } lastLineId = null; });
 skipBlank.addEventListener("change", ()=>{ try{ localStorage.setItem(STORE+"-skip", skipBlank.checked?"1":"0"); }catch(e){} render(); });
 window.addEventListener("resize", render);
 
