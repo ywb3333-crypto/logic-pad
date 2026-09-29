@@ -1,0 +1,1040 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>*,*::before,*::after{box-sizing:border-box}html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>논리 기호 연습장</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Sans+Math&display=swap">
+<style>
+/* Layout: one working column — title bar, symbol keys, the numbered writing sheet, shortcut reference under it */
+:root{
+  --bg:#eef0f2;
+  --sheet:#fbfcfd;
+  --gutter:#f1f4f6;
+  --ink:#1f2a33;
+  --muted:#5d6b76;
+  --line:#d3d9de;
+  --key:#e3e8ec;
+  --key-hover:#d6dde3;
+  --accent:#9a6a12;
+  --accent-soft:#f3e7cc;
+  --row:rgba(154,106,18,.09);
+  --font-ui:"Noto Sans KR",system-ui,sans-serif;
+  --font-pad:"IBM Plex Mono","Noto Sans Math","DejaVu Sans Mono",ui-monospace,monospace;
+  --font-sym:"Noto Sans Math","IBM Plex Mono","DejaVu Sans",sans-serif;
+  --lh:30px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141a18;--sheet:#1c2421;--gutter:#18201d;--ink:#e6ebe8;--muted:#98a6a0;--line:#2e3a36;
+  --key:#26302d;--key-hover:#31403b;--accent:#e2c064;--accent-soft:#3a3521;--row:rgba(226,192,100,.09);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141a18;--sheet:#1c2421;--gutter:#18201d;--ink:#e6ebe8;--muted:#98a6a0;--line:#2e3a36;
+  --key:#26302d;--key-hover:#31403b;--accent:#e2c064;--accent-soft:#3a3521;--row:rgba(226,192,100,.09);color-scheme:dark}
+
+body{background:var(--bg);color:var(--ink);font-family:var(--font-ui);font-size:15px;line-height:1.6;padding-inline:16px;padding-block:20px 40px}
+.wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+h1{font-size:1.35rem;font-weight:700;margin:0;text-wrap:balance}
+h1 span{color:var(--accent);font-family:var(--font-sym);font-weight:400;margin-right:6px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+button{font:inherit;font-size:12px;color:var(--ink);cursor:pointer;border:1px solid var(--line);background:var(--sheet);border-radius:5px;padding:4px 9px}
+button:hover{background:var(--key-hover)}
+button:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.warn{border-color:var(--accent);color:var(--accent)}
+
+.keys{display:flex;flex-wrap:wrap;gap:8px 14px;background:var(--sheet);border:1px solid var(--line);border-radius:8px;padding:10px}
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--sheet);border-top:1px solid var(--line);padding:8px 16px calc(8px + env(safe-area-inset-bottom, 0px))}
+.dock-in{max-width:980px;margin:0 auto;display:flex;flex-wrap:wrap;gap:6px 14px}
+
+.k.word{font-family:var(--font-ui);font-size:12px;padding:0 9px}
+.group-label{font-size:10px}
+.group{display:flex;flex-direction:column;gap:4px;min-width:0}
+.group-label{font-size:11px;letter-spacing:.06em;color:var(--muted)}
+.group-keys{display:flex;flex-wrap:wrap;gap:4px}
+.k{font-family:var(--font-sym);font-size:13px;min-width:27px;height:27px;padding:0 6px;background:var(--key);border:none;border-radius:4px;line-height:1}
+.k:hover{background:var(--key-hover)}
+
+.sheet{position:relative;background:var(--sheet);border:1px solid var(--line);border-radius:8px;display:flex;flex-direction:column;min-width:0}
+.sheet-bar{display:flex;align-items:center;justify-content:space-between;gap:8px 14px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}
+.bar-left,.bar-right{display:flex;align-items:center;gap:6px 14px;flex-wrap:wrap}
+.lines{display:flex;gap:4px;flex-wrap:wrap}
+.lines button{padding:3px 7px;font-size:12px}
+.lines button.sub{border-color:var(--accent);color:var(--accent)}
+.k.tool{font-family:var(--font-ui);font-size:13px;min-width:24px;color:var(--muted);background:transparent;border:1px dashed var(--line)}
+.toggle{display:flex;align-items:center;gap:6px;cursor:pointer}
+
+.editor{position:relative;display:flex;min-width:0;border-radius:0 0 8px 8px;overflow:hidden}
+.rowhl{position:absolute;left:0;right:0;top:0;height:var(--lh);background:var(--row);pointer-events:none;z-index:3;display:none}
+.rowhl.on{display:block}
+.resizer{flex:none;width:9px;margin:0 -4px;position:relative;z-index:4;cursor:col-resize;touch-action:none}
+.resizer::after{content:"";position:absolute;top:0;bottom:0;left:4px;width:1px;background:var(--line)}
+.resizer:hover::after,.resizer.on::after{width:3px;left:3px;background:var(--accent)}
+.gutter{flex:none;background:var(--gutter);border-right:1px solid var(--line);padding:14px 0;font-family:var(--font-pad);font-size:14px;color:var(--muted);text-align:right;user-select:none;font-variant-numeric:tabular-nums;min-width:3.2em}
+.gutter div{height:var(--lh);line-height:var(--lh);padding:0 10px 0 8px}
+.gutter div.cur{color:var(--accent);font-weight:500;background:var(--accent-soft)}
+.main{position:relative;flex:1;min-width:0}
+.hl{position:absolute;left:0;right:0;top:0;height:var(--lh);background:var(--accent-soft);opacity:0;pointer-events:none;z-index:0;transition:opacity .12s}
+.hl.on{opacity:1}
+.main textarea{position:relative;z-index:1;display:block;width:100%}
+.justcol{flex:none;width:clamp(150px,34%,320px);padding:14px 0;position:relative;background:var(--gutter)}
+.justcol::before{content:"근거";position:absolute;top:0;left:10px;font-size:10px;letter-spacing:.06em;color:var(--muted)}
+.jcell{height:var(--lh);line-height:var(--lh);padding:0 10px;font-family:var(--font-pad);font-size:14px;white-space:pre;overflow:hidden;outline:none;color:var(--ink);cursor:text}
+.jcell:focus{box-shadow:inset 0 -2px 0 var(--accent);background:var(--sheet)}
+.jcell.sep{cursor:default}
+.jcell.drop{background:var(--accent-soft)}
+.chip{display:inline-block;min-width:1.4em;padding:0 5px;margin:0 1px;border:1px solid var(--accent);border-radius:4px;font-family:var(--font-pad);font-size:12px;line-height:18px;text-align:center;color:var(--accent);background:var(--sheet);vertical-align:1px;cursor:default;user-select:none}
+.chip.bad{border-style:dashed;border-color:var(--muted);color:var(--muted)}
+.gutter .num{cursor:grab;touch-action:none}
+.gutter .num:hover{color:var(--accent)}
+.gutter div.ref{background:var(--accent-soft);color:var(--accent);font-weight:500}
+.ghost{position:fixed;z-index:30;pointer-events:none;transform:translate(-50%,-120%);padding:2px 9px;border:1px solid var(--accent);border-radius:5px;background:var(--sheet);color:var(--accent);font-family:var(--font-pad);font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+textarea{flex:1;min-width:0;min-height:calc(var(--lh) * 16 + 28px);resize:none;border:0;background:transparent;color:var(--ink);font-family:var(--font-pad);font-size:17px;line-height:var(--lh);padding:14px 16px;tab-size:4;white-space:pre;overflow-x:auto;overflow-y:hidden;box-sizing:border-box;border-radius:0}
+.toast{position:absolute;right:12px;bottom:12px;background:var(--accent-soft);color:var(--ink);font-size:13px;padding:4px 10px;border-radius:5px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+.hint{font-size:12px;color:var(--muted);padding:0 2px}
+.paste{background:var(--sheet);border:1px solid var(--accent);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.paste p{margin:0;font-size:13px;color:var(--muted)}
+.paste textarea{min-height:140px;border:1px solid var(--line);border-radius:6px;background:var(--bg);font-size:14px;line-height:1.6;padding:8px 10px;resize:vertical;overflow:auto;white-space:pre}
+.paste .row-btns{display:flex;gap:6px;flex-wrap:wrap}
+.paste .err{color:var(--accent);font-size:13px;min-height:1em}
+
+.ref{background:var(--sheet);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.ref h2{font-size:.95rem;margin:0 0 4px}
+.ref p{margin:0 0 10px;color:var(--muted);font-size:13px}
+.ref-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:4px 16px}
+.row{display:flex;align-items:center;gap:10px;padding:4px 0;border-bottom:1px dashed var(--line);min-width:0}
+.row code{font-family:var(--font-pad);font-size:14px;background:var(--key);padding:1px 6px;border-radius:4px;white-space:nowrap}
+.row .s{font-family:var(--font-sym);font-size:18px;color:var(--accent);width:22px;text-align:center}
+.row .n{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (prefers-reduced-motion: reduce){.toast,.hl{transition:none}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <h1><span>□◇</span>논리 기호 연습장</h1>
+    <div class="actions">
+      <button id="pasteBtn" type="button">붙여넣기</button>
+      <button id="copyNumBtn" type="button">번호 포함 복사</button>
+      <button id="copyBtn" type="button">글만 복사</button>
+      <button id="clearBtn" type="button">비우기</button>
+    </div>
+  </header>
+
+  <section class="paste" id="pastePanel" hidden>
+    <p>"번호 포함 복사"로 복사한 글을 아래 칸에 붙여넣으세요. 줄 번호, 가정선, 근거가 그대로 살아나고 근거의 번호는 번호 칸으로 바뀌어요.</p>
+    <textarea id="pasteBox" spellcheck="false" aria-label="붙여넣을 글"></textarea>
+    <div class="err" id="pasteErr" role="status"></div>
+    <div class="row-btns">
+      <button type="button" id="pasteReplace">덮어쓰기</button>
+      <button type="button" id="pasteAppend">아래에 이어 붙이기</button>
+      <button type="button" id="pasteClose">닫기</button>
+    </div>
+  </section>
+
+  <div class="keys" id="keys" aria-label="기호 입력 버튼"></div>
+
+  <div class="sheet">
+    <div class="sheet-bar">
+      <div class="bar-left lines">
+        <button type="button" id="openSub" class="sub">│ 가정 열기</button>
+        <button type="button" id="closeSub" class="sub">가정 닫기</button>
+        <button type="button" id="insAbove">↑ 위에 줄 넣기</button>
+        <button type="button" id="insBelow">↓ 아래에 줄 넣기</button>
+        <button type="button" id="delLine">줄 지우기</button>
+      </div>
+      <div class="bar-right">
+        <label class="toggle"><input type="checkbox" id="skipBlank" checked> 빈 줄은 번호 건너뛰기</label>
+        <label class="toggle"><input type="checkbox" id="autoToggle" checked> 치는 대로 기호로 바꾸기</label>
+      </div>
+    </div>
+    <div class="editor">
+      <div class="gutter" id="gutter" aria-hidden="true"></div>
+      <div class="main">
+        <div class="hl" id="hl"></div>
+        <textarea id="pad" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="연습장"></textarea>
+      </div>
+      <div class="resizer" id="resizer" role="separator" aria-orientation="vertical" aria-label="식과 근거 폭 조절" title="끌어서 폭 조절 · 두 번 누르면 원래대로"></div>
+      <div class="justcol" id="justcol" aria-label="근거"></div>
+      <div class="rowhl" id="rowhl"></div>
+    </div>
+    <div class="toast" id="toast" role="status"></div>
+  </div>
+  <div class="hint">가정 열기: 가정선을 한 칸 더 긋고 가정 밑줄을 달아요. 가정을 쓰고 엔터를 치면 밑줄 아래로 넘어가요. · 엔터를 치면 가정선이 다음 줄에도 이어져요. · 가정 닫기: 가정선을 한 칸 빼요. 줄 맨 앞에서 ⌫를 눌러도 한 칸 빠져요. · 근거: 왼쪽 줄 번호를 끌어다 오른쪽 근거 칸에 놓으면 번호 칸이 들어가고, 그 뒤에 이어서 쓸 수 있어요. 근거 칸을 먼저 누르고 줄 번호를 톡 눌러도 들어가요. 범위(3–10)는 줄 번호를 누른 채 번호 칸을 따라 위아래로 훑은 다음 근거 칸으로 끌어오면 돼요. 번호 칸 바로 뒤에 "–"를 쓰고 다른 번호를 넣어도 범위로 합쳐져요. 줄을 넣거나 지우면 번호 칸의 숫자도 따라 바뀌어요. 번호 칸에 마우스를 올리거나 누르면 그 줄이 색칠돼요. 근거 칸에서 엔터를 치면 다음 줄 근거로 넘어가요. · 기호로 바뀐 직후 ⌫를 누르면 원래 글자로 돌아가요.</div>
+
+  <section class="ref">
+    <h2>단축 입력</h2>
+    <p>왼쪽 글자를 치면 오른쪽 기호로 바뀌어요. 계산이나 검사는 하지 않아요.</p>
+    <div class="ref-grid" id="refGrid"></div>
+  </section>
+</div>
+
+<div class="dock" id="dock" aria-label="자주 쓰는 기호"><div class="dock-in" id="dockIn"></div></div>
+
+<script>
+const RULES = [
+  ["<=>","⟺","동치"],["<->","↔","쌍조건"],["->","→","조건"],["=>","⇒","함축"],
+  ["[]","□","필연"],["<>","◇","가능"],["~","¬","부정"],["&","∧","그리고"],
+  ["/\\","∧","그리고"],["\\/","∨","또는"],["\\A","∀","모든"],["\\E","∃","어떤"],
+  ["!|-","⊬","증명 안 됨"],["!|=","⊭","타당 아님"],["|-","⊢","증명"],["|=","⊨","함의·타당"],
+  ["_|_","⊥","모순"],["!=","≠","같지 않음"],["\\G","Γ","감마"],["\\D","Δ","델타"],
+  [":.","∴","그러므로"],["\\x","×","가지 닫힘"],["\\v","✓","체크"],["\\|","│","가정선"],
+  ["\\-","├─","가정 밑줄"]
+];
+const MATCH = [...RULES].sort((a,b)=>b[0].length-a[0].length);
+const SPACED = new Set(["∧","∨"]);
+
+const KEYS = [
+  ["연결사",["¬","∧","∨","→","↔","⊥"],"dock"],
+  ["양상",["□","◇"]],
+  ["양화·동일성",["∀","∃","=","≠"],"dock"],
+  ["메타",["⊢","⊨","⊬","⊭","Γ","Δ","∴"]],
+  ["타블로·증명",["×","✓","│","├─","─","|"]],
+  ["아래첨자",["ₖ","ₜ","ᵦ","₄","₅","ₛ","ᵣ","ₑ"]]
+];
+
+const pad = document.getElementById("pad");
+const gutter = document.getElementById("gutter");
+const auto = document.getElementById("autoToggle");
+const skipBlank = document.getElementById("skipBlank");
+const toast = document.getElementById("toast");
+const STORE = "logic-pad-v3";
+const OLD_STORE = "logic-pad-draft-v2";
+const LH = 30;
+const hlEl = document.getElementById("hl");
+const justcol = document.getElementById("justcol");
+const SAMPLE_LINES = [
+  ["∀x∀y(Rxy → Ryx)", ["전제"]],
+  ["∀x∀y∀z(Rxy ∧ Ryz → Rxz)", ["전제"]],
+  ["│ Rab ∧ Rac", ["가정"]],
+  ["├────────", []],
+  ["│ Rab", [2," ∧제거"]],
+  ["│ Rac", [2," ∧제거"]],
+  ["│ Rab → Rba", [0," ∀제거"]],
+  ["│ Rba", [4,", ",6," →제거"]],
+  ["│ Rba ∧ Rac", [7,", ",5," ∧도입"]],
+  ["│ Rba ∧ Rac → Rbc", [1," ∀제거"]],
+  ["│ Rbc", [8,", ",9," →제거"]],
+  ["Rab ∧ Rac → Rbc", [2,"–",10," →도입"]],
+  ["∀x∀y∀z(Rxy ∧ Rxz → Ryz)", [11," ∀도입"]]
+];
+
+/* each line has a stable id so number chips follow their line when lines move */
+let ids = [];
+let just = {};
+let nextId = 1;
+let prevArr = [];
+function newId(){ return "L" + (nextId++); }
+
+let last = null;
+
+/* ---------- assumption bars ---------- */
+const BAR = "│ ";
+const SEP = "├────────";
+function parse(line){
+  let d = 0, i = 0;
+  while(line.startsWith(BAR, i)){ d++; i += BAR.length; }
+  if(line.startsWith("│", i) && i + 1 === line.length){ d++; i += 1; }
+  const rest = line.slice(i);
+  const sep = rest.startsWith("├") || /^─{2,}/.test(rest);
+  return {depth:d, prefixLen:i, rest, sep};
+}
+/* depth that new content lines under this line should have */
+function contentDepth(p){ return p.sep ? p.depth + 1 : p.depth; }
+function bars(n){ return BAR.repeat(Math.max(0,n)); }
+
+/* ---------- numbering ---------- */
+function numbers(lines){
+  const out = []; let n = 0;
+  for(const l of lines){
+    const p = parse(l);
+    if(p.sep || (skipBlank.checked && p.rest.trim()==="")){ out.push(""); }
+    else { n++; out.push(String(n)); }
+  }
+  return out;
+}
+function labelMap(){
+  const lines = pad.value.split("\n"), nums = numbers(lines), m = {};
+  ids.forEach((id,i)=>{ if(nums[i]) m[id] = nums[i]; });
+  return m;
+}
+/* keep ids aligned with lines: unchanged top and bottom keep theirs, the changed middle reuses in order */
+function syncIds(){
+  const now = pad.value.split("\n");
+  if(ids.length !== prevArr.length){ ids = now.map(()=>newId()); prevArr = now; return; }
+  let k = 0;
+  while(k < now.length && k < prevArr.length && now[k] === prevArr[k]) k++;
+  let m = 0;
+  while(m < now.length - k && m < prevArr.length - k && now[now.length-1-m] === prevArr[prevArr.length-1-m]) m++;
+  const oldMid = ids.slice(k, ids.length - m);
+  const newCount = now.length - k - m;
+  const mid = [];
+  for(let i = 0; i < newCount; i++) mid.push(i < oldMid.length ? oldMid[i] : newId());
+  oldMid.slice(newCount).forEach(id=>{ delete just[id]; });
+  ids = ids.slice(0, k).concat(mid, ids.slice(ids.length - m));
+  prevArr = now;
+}
+function curLineIndex(){
+  return pad.value.slice(0, pad.selectionStart).split("\n").length - 1;
+}
+function render(){
+  syncIds();
+  const lines = pad.value.split("\n");
+  const nums = numbers(lines);
+  const labels = {};
+  ids.forEach((id,i)=>{ if(nums[i]) labels[id] = nums[i]; });
+  const cur = curLineIndex();
+  const frag = document.createDocumentFragment();
+  nums.forEach((t,i)=>{
+    const d = document.createElement("div");
+    d.textContent = t || "\u00a0";
+    if(t){ d.classList.add("num"); d.dataset.id = ids[i]; d.title = "끌어다 근거 칸에 놓기"; }
+    if(i===cur) d.classList.add("cur");
+    frag.appendChild(d);
+  });
+  gutter.replaceChildren(frag);
+  const active = document.activeElement;
+  if(active && active.classList && active.classList.contains("jcell") && justcol.children.length === lines.length){
+    refreshChips(labels);
+  } else {
+    const jf = document.createDocumentFragment();
+    lines.forEach((l,i)=>{
+      const c = document.createElement("div");
+      c.className = "jcell"; c.dataset.id = ids[i];
+      if(parse(l).sep){ c.classList.add("sep"); }
+      else { c.contentEditable = "true"; c.spellcheck = false; fillCell(c, just[ids[i]] || [], labels); }
+      jf.appendChild(c);
+    });
+    justcol.replaceChildren(jf);
+  }
+  pad.style.height = "auto";
+  pad.style.height = (pad.scrollHeight + (pad.offsetHeight - pad.clientHeight)) + "px";
+}
+function markCur(){
+  const cur = curLineIndex();
+  [...gutter.children].forEach((d,i)=>d.classList.toggle("cur", i===cur));
+}
+
+/* ---------- storage / ui helpers ---------- */
+function load(){
+  let data = null;
+  try{ data = JSON.parse(localStorage.getItem(STORE) || "null"); }catch(e){}
+  if(data && typeof data.text === "string"){
+    pad.value = data.text;
+    nextId = data.next || 1;
+    const n = data.text.split("\n").length;
+    ids = (Array.isArray(data.ids) && data.ids.length === n) ? data.ids : data.text.split("\n").map(()=>newId());
+    just = data.just || {};
+  } else {
+    let old = null;
+    try{ old = localStorage.getItem(OLD_STORE); }catch(e){}
+    if(old){ pad.value = old; ids = old.split("\n").map(()=>newId()); just = {}; }
+    else {
+      pad.value = SAMPLE_LINES.map(r=>r[0]).join("\n");
+      ids = SAMPLE_LINES.map(()=>newId());
+      just = {};
+      SAMPLE_LINES.forEach((r,i)=>{ if(r[1].length) just[ids[i]] = r[1].map(t=>typeof t === "number" ? {r:ids[t]} : t); });
+    }
+  }
+  prevArr = pad.value.split("\n");
+  try{ const s = localStorage.getItem(STORE+"-skip"); if(s!==null) skipBlank.checked = s==="1"; }catch(e){}
+}
+function save(){
+  try{ localStorage.setItem(STORE, JSON.stringify({text:pad.value, ids, just, next:nextId})); }catch(e){}
+}
+function flash(msg){
+  toast.textContent = msg; toast.classList.add("on");
+  clearTimeout(flash.t); flash.t = setTimeout(()=>toast.classList.remove("on"),1400);
+}
+function changed(){ prevLines = pad.value.split("\n").length; save(); render(); }
+
+function insert(text){
+  const a = document.activeElement;
+  if(a && a.classList && a.classList.contains("jcell")){
+    document.execCommand("insertText", false, text);
+    readCell(a); save(); return;
+  }
+  const s = pad.selectionStart, e = pad.selectionEnd;
+  if(SPACED.has(text) && pad.value[e] !== " ") text += " ";
+  pad.setRangeText(text, s, e, "end");
+  last = null; pad.focus(); changed();
+}
+
+/* ---------- line operations ---------- */
+function lineBounds(){
+  const v = pad.value, p = pad.selectionStart;
+  const start = v.lastIndexOf("\n", p-1) + 1;
+  let end = v.indexOf("\n", p); if(end === -1) end = v.length;
+  return {start, end};
+}
+function insLine(below){
+  const {start, end} = lineBounds();
+  const p = parse(pad.value.slice(start, end));
+  if(below){ const b = bars(contentDepth(p)); pad.setRangeText("\n" + b, end, end, "end"); }
+  else { const b = bars(p.depth); pad.setRangeText(b + "\n", start, start); place(start + b.length); }
+  last = null; pad.focus(); changed();
+}
+function delLine(){
+  const v = pad.value;
+  let {start, end} = lineBounds();
+  if(end < v.length) end += 1;
+  else if(start > 0) start -= 1;
+  pad.setRangeText("", start, end, "end");
+  last = null; pad.focus(); changed();
+}
+function lineAt(){
+  const {start, end} = lineBounds();
+  return {start, end, text: pad.value.slice(start, end)};
+}
+function place(pos){ pad.setSelectionRange(pos, pos); }
+function openSub(){
+  const L = lineAt(), p = parse(L.text), d = contentDepth(p);
+  if(!p.sep && p.rest.trim()===""){
+    pad.setRangeText(bars(d+1) + "\n" + bars(d) + SEP, L.start, L.end);
+    place(L.start + bars(d+1).length);
+  } else {
+    pad.setRangeText("\n" + bars(d+1) + "\n" + bars(d) + SEP, L.end, L.end);
+    place(L.end + 1 + bars(d+1).length);
+  }
+  last = null; pad.focus(); changed();
+}
+function closeSub(){
+  const L = lineAt(), p = parse(L.text);
+  if(!p.sep && p.rest.trim()==="" && p.depth > 0){
+    pad.setRangeText(bars(p.depth-1), L.start, L.end);
+    place(L.start + bars(p.depth-1).length);
+  } else {
+    const d = Math.max(contentDepth(p) - 1, 0);
+    pad.setRangeText("\n" + bars(d), L.end, L.end);
+    place(L.end + 1 + bars(d).length);
+  }
+  last = null; pad.focus(); changed();
+}
+/* Enter: continue bars; on an assumption line, jump below its underline */
+function handleEnter(){
+  const L = lineAt(), p = parse(L.text), v = pad.value;
+  const s = pad.selectionStart, e = pad.selectionEnd;
+  if(s === e && s === L.end && L.end < v.length && !p.sep){
+    let ne = v.indexOf("\n", L.end + 1); if(ne === -1) ne = v.length;
+    const np = parse(v.slice(L.end + 1, ne));
+    if(np.sep && np.depth === p.depth - 1){
+      pad.setRangeText("\n" + bars(p.depth), ne, ne);
+      place(ne + 1 + bars(p.depth).length);
+      return true;
+    }
+  }
+  const prefix = bars(contentDepth(p));
+  if(!prefix) return false;
+  pad.setRangeText("\n" + prefix, s, e, "end");
+  return true;
+}
+[["openSub",openSub],["closeSub",closeSub],["insAbove",()=>insLine(false)],["insBelow",()=>insLine(true)],["delLine",delLine]].forEach(([id,fn])=>{
+  const b = document.getElementById(id);
+  b.addEventListener("mousedown", e=>e.preventDefault());
+  b.addEventListener("click", fn);
+});
+
+/* ---------- auto replace ---------- */
+/* Any new line (keyboard, Korean IME, tablet keyboard) gets the bars of the line above
+   until the assumption is closed. Runs after the text has settled, not mid-composition. */
+let composing = false;
+let prevLines = 0;
+function fixNewLine(){
+  const v = pad.value, n = v.split("\n").length;
+  const grew = n === prevLines + 1;
+  if(!grew) return false;
+  const pos = pad.selectionStart;
+  if(pos !== pad.selectionEnd) return false;
+  const ls = v.lastIndexOf("\n", pos - 1) + 1;
+  if(ls === 0) return false;
+  let le = v.indexOf("\n", pos); if(le === -1) le = v.length;
+  const cur = parse(v.slice(ls, le));
+  if(cur.depth > 0 || cur.sep) return false;
+  const pe = ls - 1, ps = v.lastIndexOf("\n", pe - 1) + 1;
+  const prev = parse(v.slice(ps, pe));
+  const d = contentDepth(prev);
+  if(!d) return false;
+  if(!prev.sep && cur.rest === "" && le < v.length){
+    let ne = v.indexOf("\n", le + 1); if(ne === -1) ne = v.length;
+    const np = parse(v.slice(le + 1, ne));
+    if(np.sep && np.depth === prev.depth - 1){
+      const b = bars(prev.depth);
+      pad.setRangeText(v.slice(le, ne) + "\n" + b, pe, ne);
+      place(pe + (ne - le) + 1 + b.length);
+      return true;
+    }
+  }
+  const b = bars(d);
+  pad.setRangeText(b, ls, ls);
+  place(pos + b.length);
+  return true;
+}
+function settle(){
+  if(composing) return;
+  if(fixNewLine()) last = null;
+  prevLines = pad.value.split("\n").length;
+  save(); render();
+}
+pad.addEventListener("compositionstart", ()=>{ composing = true; });
+pad.addEventListener("compositionend", ()=>{ composing = false; setTimeout(settle, 0); });
+pad.addEventListener("keyup", ()=>setTimeout(settle, 0));
+
+pad.addEventListener("input", ev=>{
+  if(ev.isComposing || composing){ save(); render(); return; }
+  if(!/FromPaste|FromDrop|history/.test(ev.inputType || "") && fixNewLine()){
+    last = null; changed(); return;
+  }
+  if(!auto.checked || ev.isComposing || !ev.inputType || !ev.inputType.startsWith("insert") || pad.selectionStart !== pad.selectionEnd){
+    last = null; changed(); return;
+  }
+  const pos = pad.selectionStart;
+  const before = pad.value.slice(0,pos);
+  last = null;
+  for(const [from,to] of MATCH){
+    if(before.endsWith(from)){
+      const start = pos - from.length;
+      const out = SPACED.has(to) && pad.value[pos] !== " " ? to + " " : to;
+      pad.setRangeText(out, start, pos, "end");
+      last = {start, from, to: out};
+      break;
+    }
+  }
+  changed();
+});
+
+pad.addEventListener("keydown", ev=>{
+  if(ev.isComposing) return;
+  if(ev.key === "Backspace" && last){
+    const end = last.start + last.to.length;
+    if(pad.selectionStart === end && pad.selectionEnd === end && pad.value.slice(last.start,end) === last.to){
+      ev.preventDefault();
+      pad.setRangeText(last.from, last.start, end, "end");
+      last = null; changed(); return;
+    }
+  }
+  if(ev.key === "Enter" && !ev.shiftKey && !ev.ctrlKey && !ev.altKey && !ev.metaKey){
+    if(handleEnter()){ ev.preventDefault(); last = null; changed(); }
+    return;
+  }
+  if(ev.key === "Backspace" && pad.selectionStart === pad.selectionEnd){
+    const L = lineAt(), p = parse(L.text), c = pad.selectionStart;
+    if(!p.sep && p.depth > 0 && c === L.start + p.prefixLen){
+      const unit = L.text.slice(0, p.prefixLen).endsWith(BAR) ? BAR.length : 1;
+      ev.preventDefault();
+      pad.setRangeText("", c - unit, c, "end");
+      last = null; changed(); return;
+    }
+  }
+  if(ev.key === "Tab"){ ev.preventDefault(); insert("    "); return; }
+  if(ev.key.length !== 1 && ev.key !== "Backspace" && !["Shift","Control","Alt","Meta"].includes(ev.key)) last = null;
+});
+["click","keyup","select","focus"].forEach(t=>pad.addEventListener(t, markCur));
+pad.addEventListener("click", ()=>{ last = null; });
+skipBlank.addEventListener("change", ()=>{ try{ localStorage.setItem(STORE+"-skip", skipBlank.checked?"1":"0"); }catch(e){} render(); });
+window.addEventListener("resize", render);
+
+/* ---------- keys + reference ---------- */
+const keysEl = document.getElementById("keys");
+const dockEl = document.getElementById("dockIn");
+const dock = document.getElementById("dock");
+function padForDock(){ document.body.style.paddingBottom = (dock.offsetHeight + 16) + "px"; }
+if(window.ResizeObserver) new ResizeObserver(padForDock).observe(dock);
+window.addEventListener("resize", padForDock);
+KEYS.forEach(([label, syms, where])=>{
+  const g = document.createElement("div"); g.className="group";
+  g.innerHTML = `<div class="group-label">${label}</div><div class="group-keys"></div>`;
+  const row = g.querySelector(".group-keys");
+  syms.forEach(s=>{
+    const b = document.createElement("button");
+    b.type="button"; b.className="k"; b.textContent=s; b.setAttribute("aria-label", s+" 넣기");
+    b.addEventListener("mousedown", e=>e.preventDefault());
+    b.addEventListener("click", ()=>insert(s));
+    row.appendChild(b);
+  });
+  (where === "dock" ? dockEl : keysEl).appendChild(g);
+});
+
+/* letter keys that grow: x y z, then a b c d ... */
+function varGroup(label, seq, key){
+  let count = 3;
+  try{ const s = parseInt(localStorage.getItem(key), 10); if(s >= 1 && s <= seq.length) count = s; }catch(e){}
+  const g = document.createElement("div"); g.className = "group";
+  g.innerHTML = `<div class="group-label">${label}</div><div class="group-keys"></div>`;
+  const row = g.querySelector(".group-keys");
+  const mk = (text, cls, aria, fn)=>{
+    const b = document.createElement("button");
+    b.type = "button"; b.className = cls; b.textContent = text; b.setAttribute("aria-label", aria);
+    b.addEventListener("mousedown", e=>e.preventDefault());
+    b.addEventListener("click", fn);
+    return b;
+  };
+  function draw(){
+    row.replaceChildren();
+    seq.slice(0, count).forEach(ch=>row.appendChild(mk(ch, "k", ch+" 넣기", ()=>insert(ch))));
+    if(count < seq.length) row.appendChild(mk("+", "k tool", label+" 하나 더", ()=>{ count++; persist(); draw(); }));
+    if(count > 1) row.appendChild(mk("−", "k tool", label+" 하나 빼기", ()=>{ count--; persist(); draw(); }));
+  }
+  function persist(){ try{ localStorage.setItem(key, String(count)); }catch(e){} }
+  draw();
+  dockEl.appendChild(g);
+}
+varGroup("소문자", [..."xyzabcdefghijklmnopqrstuvw"], "logic-pad-lower");
+varGroup("대문자", [..."RSTUVWXYZABCDEFGHIJKLMNOPQ"], "logic-pad-upper-r");
+
+const refGrid = document.getElementById("refGrid");
+RULES.forEach(([from,to,name])=>{
+  const r = document.createElement("div"); r.className="row";
+  r.innerHTML = `<code></code><span class="s"></span><span class="n"></span>`;
+  r.children[0].textContent = from; r.children[1].textContent = to; r.children[2].textContent = name;
+  refGrid.appendChild(r);
+});
+
+/* ---------- copy / clear ---------- */
+function justText(id, labels){
+  return (just[id] || []).map(t=>typeof t === "string" ? t : chipLabel(t.r, t.to, labels).text).join("").trim();
+}
+function numberedText(){
+  const lines = pad.value.split("\n");
+  const nums = numbers(lines);
+  const labels = labelMap();
+  /* figure space = width of a digit, punctuation space = width of "." — keeps the
+     unnumbered underline row lined up with the bars even in apps that don't use a fixed-width font */
+  const FIG = "\u2007", PUNC = "\u2008";
+  const dw = Math.max(...nums.map(n=>n.length), 1);
+  const fw = Math.max(...lines.map(l=>[...l].length), 0);
+  return lines.map((l,i)=>{
+    const tag = nums[i] ? nums[i] + "." + FIG.repeat(dw - nums[i].length) + "  " : FIG.repeat(dw) + PUNC + "  ";
+    const j = justText(ids[i], labels);
+    const body = j ? l + " ".repeat(fw - [...l].length) + "    " + j : l;
+    return (tag + " " + body).trimEnd();
+  }).join("\n");
+}
+function copy(text){
+  const fallback = ()=>{ pad.focus(); pad.select(); flash("전체 선택됨 · 길게 눌러 복사하세요"); };
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(()=>flash("복사했어요"), fallback);
+    } else fallback();
+  }catch(e){ fallback(); }
+}
+document.getElementById("copyNumBtn").addEventListener("click", ()=>copy(numberedText()));
+document.getElementById("copyBtn").addEventListener("click", ()=>copy(pad.value));
+
+const clearBtn = document.getElementById("clearBtn");
+let armed = false;
+clearBtn.addEventListener("click", ()=>{
+  if(!armed){
+    armed = true; clearBtn.textContent = "한 번 더 누르면 지워요"; clearBtn.classList.add("warn");
+    setTimeout(()=>{ armed=false; clearBtn.textContent="비우기"; clearBtn.classList.remove("warn"); }, 3000);
+    return;
+  }
+  armed = false; clearBtn.textContent="비우기"; clearBtn.classList.remove("warn");
+  pad.value = ""; just = {}; last = null; pad.focus(); changed(); flash("비웠어요");
+});
+
+/* ---------- justification cells ---------- */
+function chipLabel(ref, to, labels){
+  const a = labels[ref], b = to ? labels[to] : null;
+  if(!to) return {text: a || "?", ok: !!a};
+  return {text: (a || "?") + "–" + (b || "?"), ok: !!(a && b)};
+}
+function makeChip(id, labels, to){
+  const c = document.createElement("span");
+  c.className = "chip"; c.contentEditable = "false"; c.dataset.ref = id;
+  if(to) c.dataset.to = to;
+  const L = chipLabel(id, to, labels);
+  c.textContent = L.text;
+  if(!L.ok) c.classList.add("bad");
+  return c;
+}
+function fillCell(cell, tokens, labels){
+  cell.replaceChildren();
+  tokens.forEach(t=>cell.appendChild(typeof t === "string" ? document.createTextNode(t) : makeChip(t.r, labels, t.to)));
+}
+function refreshChips(labels){
+  justcol.querySelectorAll(".chip").forEach(c=>{
+    const L = chipLabel(c.dataset.ref, c.dataset.to, labels);
+    c.textContent = L.text; c.classList.toggle("bad", !L.ok);
+  });
+}
+function readCell(cell){
+  const out = [];
+  cell.childNodes.forEach(n=>{
+    if(n.nodeType === 3){ if(typeof out[out.length-1] === "string") out[out.length-1] += n.data; else out.push(n.data); }
+    else if(n.classList && n.classList.contains("chip")) out.push(n.dataset.to ? {r:n.dataset.ref, to:n.dataset.to} : {r:n.dataset.ref});
+    else if(n.textContent){ out.push(n.textContent); }
+  });
+  const clean = out.filter(t=>typeof t !== "string" || t !== "");
+  if(clean.length) just[cell.dataset.id] = clean; else delete just[cell.dataset.id];
+}
+function caretAfter(node){
+  const r = document.createRange();
+  r.setStartAfter(node); r.collapse(true);
+  const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+}
+function insertChip(cell, id, range, to){
+  const labels = labelMap();
+  let r = (range && cell.contains(range.startContainer)) ? range : null;
+  if(r){
+    const inChip = (r.startContainer.nodeType === 3 ? r.startContainer.parentElement : r.startContainer).closest(".chip");
+    if(inChip){ r = document.createRange(); r.setStartAfter(inChip); r.collapse(true); }
+  } else { r = document.createRange(); r.selectNodeContents(cell); r.collapse(false); }
+  cell.focus();
+  r.deleteContents();
+  /* "3–" right before the caret + a new number → one range chip 3–n */
+  if(!to && r.startContainer.nodeType === 3){
+    const tn = r.startContainer, before = tn.data.slice(0, r.startOffset);
+    const m = before.match(/\s*[–-]\s*$/);
+    const pc = tn.previousSibling;
+    if(m && before.length === m[0].length && pc && pc.classList && pc.classList.contains("chip") && !pc.dataset.to){
+      tn.data = tn.data.slice(r.startOffset);
+      const merged = makeChip(pc.dataset.ref, labels, id);
+      pc.replaceWith(merged);
+      let nx = merged.nextSibling;
+      if(!(nx && nx.nodeType === 3 && /^[\s,]/.test(nx.data))){ nx = document.createTextNode(" "); merged.after(nx); }
+      const r2 = document.createRange(); r2.setStart(nx, Math.min(1, nx.data.length)); r2.collapse(true);
+      const sl = getSelection(); sl.removeAllRanges(); sl.addRange(r2);
+      readCell(cell); save(); return;
+    }
+  }
+  const chip = makeChip(id, labels, to);
+  r.insertNode(chip);
+  /* separate from a chip right before it with ", " */
+  let prev = chip.previousSibling;
+  if(prev && prev.nodeType === 3 && prev.data.trim() === "" && prev.previousSibling && prev.previousSibling.classList && prev.previousSibling.classList.contains("chip")){
+    prev.data = ", ";
+  } else if(prev && prev.classList && prev.classList.contains("chip")){
+    cell.insertBefore(document.createTextNode(", "), chip);
+  } else if(prev && prev.nodeType === 3 && prev.data !== "" && !/[\s,–\-(]$/.test(prev.data)){
+    prev.data += " ";
+  }
+  let next = chip.nextSibling;
+  if(!(next && next.nodeType === 3 && /^[\s,]/.test(next.data))){
+    next = document.createTextNode(" ");
+    chip.after(next);
+  }
+  const rr = document.createRange(); rr.setStart(next, Math.min(1, next.data.length)); rr.collapse(true);
+  const sel = getSelection(); sel.removeAllRanges(); sel.addRange(rr);
+  readCell(cell); save();
+}
+
+/* remember where the caret was in a justification cell, for tap-to-insert */
+let lastJ = null;
+document.addEventListener("selectionchange", ()=>{
+  const sel = getSelection();
+  if(!sel.rangeCount) return;
+  const n = sel.anchorNode;
+  const el = n && (n.nodeType === 3 ? n.parentElement : n);
+  const cell = el && el.closest && el.closest(".jcell");
+  if(cell && cell.isContentEditable) lastJ = {id: cell.dataset.id, range: sel.getRangeAt(0).cloneRange()};
+});
+
+justcol.addEventListener("input", ev=>{
+  const cell = ev.target.closest && ev.target.closest(".jcell");
+  if(!cell) return;
+  if(auto.checked && !ev.isComposing && ev.inputType && ev.inputType.startsWith("insert")){
+    const sel = getSelection(), node = sel.anchorNode, off = sel.anchorOffset;
+    if(node && node.nodeType === 3){
+      const before = node.data.slice(0, off);
+      for(const [from,to] of MATCH){
+        if(before.endsWith(from)){
+          node.data = before.slice(0, -from.length) + to + node.data.slice(off);
+          const pos = off - from.length + to.length;
+          const r = document.createRange(); r.setStart(node, pos); r.collapse(true);
+          sel.removeAllRanges(); sel.addRange(r);
+          break;
+        }
+      }
+    }
+  }
+  readCell(cell); save();
+});
+justcol.addEventListener("keydown", ev=>{
+  const cell = ev.target.closest && ev.target.closest(".jcell");
+  if(!cell || ev.isComposing) return;
+  const move = ev.key === "Enter" || ev.key === "ArrowDown" ? 1 : ev.key === "ArrowUp" ? -1 : 0;
+  if(!move) return;
+  ev.preventDefault();
+  const cells = [...justcol.children];
+  let i = cells.indexOf(cell) + move;
+  while(cells[i] && !cells[i].isContentEditable) i += move;
+  const t = cells[i];
+  if(t){
+    t.focus();
+    const r = document.createRange(); r.selectNodeContents(t); r.collapse(false);
+    const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  }
+});
+
+/* highlight the line a chip points to */
+let hlTimer = null;
+function showRef(id, to){
+  let a = ids.indexOf(id), b = to ? ids.indexOf(to) : a;
+  if(a < 0 || b < 0){ [...gutter.children].forEach(d=>d.classList.remove("ref")); hlEl.classList.remove("on"); return; }
+  if(b < a) [a, b] = [b, a];
+  [...gutter.children].forEach((d,i)=>d.classList.toggle("ref", i >= a && i <= b));
+  hlEl.style.top = (14 + a * LH) + "px";
+  hlEl.style.height = ((b - a + 1) * LH) + "px";
+  hlEl.classList.add("on");
+}
+function hideRef(){
+  hlEl.classList.remove("on");
+  [...gutter.children].forEach(d=>d.classList.remove("ref"));
+}
+justcol.addEventListener("pointerover", ev=>{
+  const c = ev.target.closest && ev.target.closest(".chip");
+  if(c){ clearTimeout(hlTimer); showRef(c.dataset.ref, c.dataset.to); }
+});
+justcol.addEventListener("pointerout", ev=>{
+  const c = ev.target.closest && ev.target.closest(".chip");
+  if(c && ev.pointerType === "mouse") hideRef();
+});
+justcol.addEventListener("pointerdown", ev=>{
+  const c = ev.target.closest && ev.target.closest(".chip");
+  if(c && ev.pointerType !== "mouse"){ showRef(c.dataset.ref, c.dataset.to); clearTimeout(hlTimer); hlTimer = setTimeout(hideRef, 1600); }
+});
+
+/* drag a line number from the gutter into a justification cell (mouse, touch, pen) */
+let drag = null;
+function cellAt(x, y){
+  const el = document.elementFromPoint(x, y);
+  const cell = el && el.closest && el.closest(".jcell");
+  return cell && cell.isContentEditable ? cell : null;
+}
+function rangeAt(x, y){
+  if(document.caretRangeFromPoint) return document.caretRangeFromPoint(x, y);
+  if(document.caretPositionFromPoint){
+    const p = document.caretPositionFromPoint(x, y);
+    if(p){ const r = document.createRange(); r.setStart(p.offsetNode, p.offset); r.collapse(true); return r; }
+  }
+  return null;
+}
+gutter.addEventListener("pointerdown", ev=>{
+  const d = ev.target.closest(".num");
+  if(!d) return;
+  ev.preventDefault();
+  drag = {id:d.dataset.id, to:null, label:d.textContent, x:ev.clientX, y:ev.clientY, moved:false, ghost:null, over:null, left:false};
+  gutter.setPointerCapture(ev.pointerId);
+});
+gutter.addEventListener("pointermove", ev=>{
+  if(!drag) return;
+  if(!drag.moved && Math.hypot(ev.clientX - drag.x, ev.clientY - drag.y) < 6) return;
+  if(!drag.moved){
+    drag.moved = true;
+    drag.ghost = document.createElement("div");
+    drag.ghost.className = "ghost"; drag.ghost.textContent = drag.label;
+    document.body.appendChild(drag.ghost);
+  }
+  drag.ghost.style.left = ev.clientX + "px"; drag.ghost.style.top = ev.clientY + "px";
+  const gr = gutter.getBoundingClientRect();
+  if(!drag.left && ev.clientX <= gr.right){
+    /* still in the number column: sliding up/down picks a range */
+    const idx = Math.floor((ev.clientY - gr.top - 14) / LH);
+    const row = gutter.children[idx];
+    if(row && row.classList.contains("num")){
+      drag.to = row.dataset.id === drag.id ? null : row.dataset.id;
+      const labels = labelMap();
+      let a = ids.indexOf(drag.id), b = drag.to ? ids.indexOf(drag.to) : a;
+      const lo = Math.min(a, b), hi = Math.max(a, b);
+      drag.ghost.textContent = drag.to ? labels[ids[lo]] + "–" + labels[ids[hi]] : drag.label;
+      showRef(drag.id, drag.to);
+    }
+  } else if(!drag.left){ drag.left = true; }
+  const cell = cellAt(ev.clientX, ev.clientY);
+  if(drag.over !== cell){ if(drag.over) drag.over.classList.remove("drop"); if(cell) cell.classList.add("drop"); drag.over = cell; }
+});
+function endDrag(ev, cancel){
+  if(!drag) return;
+  const g = drag; drag = null;
+  if(g.ghost) g.ghost.remove();
+  if(g.over) g.over.classList.remove("drop");
+  hideRef();
+  if(cancel) return;
+  if(g.moved){
+    const cell = cellAt(ev.clientX, ev.clientY);
+    if(cell){
+      let a = g.id, b = g.to;
+      if(b && ids.indexOf(b) < ids.indexOf(a)) [a, b] = [b, a];
+      insertChip(cell, a, rangeAt(ev.clientX, ev.clientY), b);
+    }
+    return;
+  }
+  /* a tap: put the chip where the caret last was in a justification cell */
+  if(lastJ){
+    const cell = justcol.querySelector('.jcell[data-id="' + lastJ.id + '"]');
+    if(cell && cell.isContentEditable){ insertChip(cell, g.id, lastJ.range.startContainer.isConnected ? lastJ.range : null); return; }
+  }
+  flash("근거 칸을 먼저 누르거나, 번호를 근거 칸으로 끌어다 놓으세요");
+}
+gutter.addEventListener("pointerup", ev=>endDrag(ev, false));
+gutter.addEventListener("pointercancel", ev=>endDrag(ev, true));
+
+/* ---------- justification-only words (second dock row, shown while a justification cell is in use) ---------- */
+const JUST_WORDS = ["전제","가정","도입","제거","–"];
+const justGroup = document.createElement("div");
+justGroup.className = "group dock-just";
+justGroup.innerHTML = '<div class="group-label">근거 칸 전용</div><div class="group-keys"></div>';
+const dockJust = justGroup.querySelector(".group-keys");
+function insertJust(text){
+  let cell = document.activeElement;
+  if(!(cell && cell.classList && cell.classList.contains("jcell"))){
+    cell = justcol.children[curLineIndex()];
+    if(!cell || !cell.isContentEditable) return;
+    cell.focus();
+    const r = document.createRange(); r.selectNodeContents(cell); r.collapse(false);
+    const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  }
+  document.execCommand("insertText", false, text);
+  readCell(cell); save();
+}
+JUST_WORDS.forEach(w=>{
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "k word"; b.textContent = w; b.setAttribute("aria-label", "근거에 " + w + " 넣기");
+  b.addEventListener("mousedown", e=>e.preventDefault());
+  b.addEventListener("click", ()=>insertJust(w));
+  dockJust.appendChild(b);
+});
+dockEl.appendChild(justGroup);
+document.addEventListener("focusin", ev=>{
+  const t = ev.target;
+  if(t.classList && t.classList.contains("jcell")) dock.classList.add("just");
+  else if(t === pad) dock.classList.remove("just");
+});
+
+/* ---------- paste numbered text back in ---------- */
+function parseNumbered(text){
+  const raw = text.replace(/\r/g, "").replace(/\n+$/, "").split("\n");
+  const numbered = raw.filter(l=>/^\s*\d+\.\s/.test(l)).length;
+  if(numbered < 1) return null;
+  let tagW = 0;
+  for(const l of raw){ const m = l.match(/^\s*\d+\.\s+/); if(m){ tagW = m[0].length; break; } }
+  const lines = [], justs = [], labels = [];
+  for(const l of raw){
+    const m = l.match(/^\s*(\d+)\.\s+/);
+    let body;
+    if(m){ body = l.slice(m[0].length); labels.push(m[1]); }
+    else { body = l.slice(0, tagW).trim() === "" ? l.slice(tagW) : l.replace(/^\s+/, ""); labels.push(null); }
+    let j = "";
+    const mm = body.match(/^(.*\S)\s{3,}(\S.*)$/);
+    if(mm && /^[\d가-힣]/.test(mm[2])){ body = mm[1]; j = mm[2].trim(); }
+    lines.push(body.replace(/\s+$/, "")); justs.push(j);
+  }
+  return {lines, justs, labels};
+}
+function tokenizeJust(j, idOf){
+  const out = [];
+  const push = t=>{ if(typeof t === "string" && typeof out[out.length-1] === "string") out[out.length-1] += t; else out.push(t); };
+  const re = /(\d+)\s*[–-]\s*(\d+)|(\d+)/g;
+  let m, lastI = 0;
+  while((m = re.exec(j))){
+    if(m.index > lastI) push(j.slice(lastI, m.index));
+    if(m[1]){ const a = idOf(m[1]), b = idOf(m[2]); push(a && b ? {r:a, to:b} : m[0]); }
+    else { const a = idOf(m[3]); push(a ? {r:a} : m[0]); }
+    lastI = re.lastIndex;
+  }
+  if(lastI < j.length) push(j.slice(lastI));
+  return out;
+}
+function applyParsed(p, mode){
+  const baseLines = mode === "append" && pad.value.trim() !== "" ? pad.value.split("\n") : [];
+  const baseIds = baseLines.length ? ids.slice() : [];
+  if(!baseLines.length) just = {};
+  const newIds = p.lines.map(()=>newId());
+  const byLabel = {};
+  p.labels.forEach((lab,i)=>{ if(lab) byLabel[lab] = newIds[i]; });
+  p.justs.forEach((j,i)=>{ if(j){ const t = tokenizeJust(j, n=>byLabel[n]); if(t.length) just[newIds[i]] = t; } });
+  pad.value = baseLines.concat(p.lines).join("\n");
+  ids = baseIds.concat(newIds);
+  prevArr = pad.value.split("\n");
+  last = null; changed();
+}
+const pastePanel = document.getElementById("pastePanel");
+const pasteBox = document.getElementById("pasteBox");
+const pasteErr = document.getElementById("pasteErr");
+document.getElementById("pasteBtn").addEventListener("click", ()=>{
+  pastePanel.hidden = !pastePanel.hidden;
+  pasteErr.textContent = "";
+  if(!pastePanel.hidden) pasteBox.focus();
+});
+document.getElementById("pasteClose").addEventListener("click", ()=>{ pastePanel.hidden = true; });
+function fromBox(mode){
+  const p = parseNumbered(pasteBox.value);
+  if(!p){ pasteErr.textContent = "줄 번호(1. 2. …)가 붙은 글이 아니에요. \"번호 포함 복사\"로 복사한 글을 붙여넣어 주세요."; return; }
+  applyParsed(p, mode);
+  pasteBox.value = ""; pasteErr.textContent = ""; pastePanel.hidden = true;
+  flash(mode === "append" ? "아래에 이어 붙였어요" : "불러왔어요");
+}
+document.getElementById("pasteReplace").addEventListener("click", ()=>fromBox("replace"));
+document.getElementById("pasteAppend").addEventListener("click", ()=>fromBox("append"));
+pasteBox.addEventListener("input", ()=>{ pasteErr.textContent = ""; });
+/* pasting numbered text straight into the sheet works too */
+pad.addEventListener("paste", ev=>{
+  const t = ev.clipboardData && ev.clipboardData.getData("text/plain");
+  if(!t || t.split("\n").filter(l=>/^\s*\d+\.\s/.test(l)).length < 2) return;
+  const p = parseNumbered(t);
+  if(!p) return;
+  ev.preventDefault();
+  const all = pad.value.trim() === "" || (pad.selectionStart === 0 && pad.selectionEnd === pad.value.length);
+  applyParsed(p, all ? "replace" : "append");
+  flash(all ? "불러왔어요" : "아래에 이어 붙였어요");
+});
+
+/* ---------- row hover ---------- */
+const editor = document.querySelector(".editor");
+const rowhl = document.getElementById("rowhl");
+editor.addEventListener("pointermove", ev=>{
+  if(ev.pointerType === "touch" || drag || rs){ rowhl.classList.remove("on"); return; }
+  const top = editor.getBoundingClientRect().top + 14;
+  const idx = Math.floor((ev.clientY - top) / LH);
+  if(idx < 0 || idx >= ids.length){ rowhl.classList.remove("on"); return; }
+  rowhl.style.top = (14 + idx * LH) + "px";
+  rowhl.classList.add("on");
+});
+editor.addEventListener("pointerleave", ()=>rowhl.classList.remove("on"));
+
+/* ---------- resize formula / justification columns ---------- */
+const resizer = document.getElementById("resizer");
+let rs = null;
+function setJustWidth(w){
+  const max = editor.clientWidth - gutter.offsetWidth - 120;
+  w = Math.max(90, Math.min(w, max));
+  justcol.style.width = w + "px";
+  return w;
+}
+try{ const w = parseInt(localStorage.getItem(STORE + "-jw"), 10); if(w > 0) setJustWidth(w); }catch(e){}
+resizer.addEventListener("pointerdown", ev=>{
+  ev.preventDefault();
+  rs = {x: ev.clientX, w: justcol.offsetWidth};
+  resizer.classList.add("on");
+  resizer.setPointerCapture(ev.pointerId);
+});
+resizer.addEventListener("pointermove", ev=>{
+  if(!rs) return;
+  setJustWidth(rs.w - (ev.clientX - rs.x));
+});
+function endResize(){
+  if(!rs) return;
+  rs = null; resizer.classList.remove("on");
+  try{ localStorage.setItem(STORE + "-jw", String(justcol.offsetWidth)); }catch(e){}
+}
+resizer.addEventListener("pointerup", endResize);
+resizer.addEventListener("pointercancel", endResize);
+resizer.addEventListener("dblclick", ()=>{
+  justcol.style.width = "";
+  try{ localStorage.removeItem(STORE + "-jw"); }catch(e){}
+});
+
+load();
+prevLines = pad.value.split("\n").length;
+render();
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(render);
+</script>
+
+</body>
+</html>
