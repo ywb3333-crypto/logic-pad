@@ -81,7 +81,7 @@ button.warn{border-color:var(--accent);color:var(--accent)}
 .hl.on{opacity:1}
 .main textarea{position:relative;z-index:1;display:block;width:100%}
 .justcol{flex:none;width:clamp(150px,34%,320px);padding:14px 0;position:relative;background:var(--gutter)}
-.justcol::before{content:"근거";position:absolute;top:0;left:10px;font-size:10px;letter-spacing:.06em;color:var(--muted)}
+.justcol::before{content:"정당화";position:absolute;top:0;left:10px;font-size:10px;letter-spacing:.06em;color:var(--muted)}
 .jcell{height:var(--lh);line-height:var(--lh);padding:0 10px;font-family:var(--font-pad);font-size:14px;white-space:pre;overflow:hidden;outline:none;color:var(--ink);cursor:text}
 .jcell:focus{box-shadow:inset 0 -2px 0 var(--accent);background:var(--sheet)}
 .jcell.sep{cursor:default}
@@ -128,7 +128,7 @@ textarea{flex:1;min-width:0;min-height:calc(var(--lh) * 16 + 28px);resize:none;b
   </header>
 
   <section class="paste" id="pastePanel" hidden>
-    <p>"번호 포함 복사"로 복사한 글을 아래 칸에 붙여넣으세요. 줄 번호, 가정선, 근거가 그대로 살아나고 근거의 번호는 번호 칸으로 바뀌어요.</p>
+    <p>"번호 포함 복사"로 복사한 글을 아래 칸에 붙여넣으세요. 줄 번호, 가정선, 정당화가 그대로 살아나고 정당화의 번호는 번호 칸으로 바뀌어요.</p>
     <textarea id="pasteBox" spellcheck="false" aria-label="붙여넣을 글"></textarea>
     <div class="err" id="pasteErr" role="status"></div>
     <div class="row-btns">
@@ -160,13 +160,13 @@ textarea{flex:1;min-width:0;min-height:calc(var(--lh) * 16 + 28px);resize:none;b
         <div class="hl" id="hl"></div>
         <textarea id="pad" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="연습장"></textarea>
       </div>
-      <div class="resizer" id="resizer" role="separator" aria-orientation="vertical" aria-label="식과 근거 폭 조절" title="끌어서 폭 조절 · 두 번 누르면 원래대로"></div>
-      <div class="justcol" id="justcol" aria-label="근거"></div>
+      <div class="resizer" id="resizer" role="separator" aria-orientation="vertical" aria-label="식과 정당화 폭 조절" title="끌어서 폭 조절 · 두 번 누르면 원래대로"></div>
+      <div class="justcol" id="justcol" aria-label="정당화"></div>
       <div class="rowhl" id="rowhl"></div>
     </div>
     <div class="toast" id="toast" role="status"></div>
   </div>
-  <div class="hint">가정 열기: 가정선을 한 칸 더 긋고 가정 밑줄을 달아요. 가정을 쓰고 엔터를 치면 밑줄 아래로 넘어가요. · 엔터를 치면 가정선이 다음 줄에도 이어져요. · 가정 닫기: 가정선을 한 칸 빼요. 줄 맨 앞에서 ⌫를 눌러도 한 칸 빠져요. · 근거: 왼쪽 줄 번호를 끌어다 오른쪽 근거 칸에 놓으면 번호 칸이 들어가고, 그 뒤에 이어서 쓸 수 있어요. 근거 칸을 먼저 누르고 줄 번호를 톡 눌러도 들어가요. 범위(3–10)는 줄 번호를 누른 채 번호 칸을 따라 위아래로 훑은 다음 근거 칸으로 끌어오면 돼요. 번호 칸 바로 뒤에 "–"를 쓰고 다른 번호를 넣어도 범위로 합쳐져요. 줄을 넣거나 지우면 번호 칸의 숫자도 따라 바뀌어요. 번호 칸에 마우스를 올리거나 누르면 그 줄이 색칠돼요. 근거 칸에서 엔터를 치면 다음 줄 근거로 넘어가요. · 기호로 바뀐 직후 ⌫를 누르면 원래 글자로 돌아가요.</div>
+  <div class="hint">가정 열기: 가정선을 한 칸 더 긋고 가정 밑줄을 달아요. 가정을 쓰고 엔터를 치면 밑줄 아래로 넘어가요. · 엔터를 치면 가정선이 다음 줄에도 이어져요. · 가정 닫기: 가정선을 한 칸 빼요. 줄 맨 앞에서 ⌫를 눌러도 한 칸 빠져요. · 정당화: 왼쪽 줄 번호를 끌어다 오른쪽 정당화 칸에 놓으면 번호 칸이 들어가고, 그 뒤에 이어서 쓸 수 있어요. 정당화 칸을 먼저 누르고 줄 번호를 톡 눌러도 들어가요. 범위(3–10)는 줄 번호를 누른 채 번호 칸을 따라 위아래로 훑은 다음 정당화 칸으로 끌어오면 돼요. 번호 칸 바로 뒤에 "–"를 쓰고 다른 번호를 넣어도 범위로 합쳐져요. 줄을 넣거나 지우면 번호 칸의 숫자도 따라 바뀌어요. 번호 칸에 마우스를 올리거나 누르면 그 줄이 색칠돼요. 정당화 칸에서 엔터를 치면 다음 줄 정당화로 넘어가요. · 기호로 바뀐 직후 ⌫를 누르면 원래 글자로 돌아가요.</div>
 
   <section class="ref">
     <h2>단축 입력</h2>
@@ -294,7 +294,7 @@ function render(){
   nums.forEach((t,i)=>{
     const d = document.createElement("div");
     d.textContent = t || "\u00a0";
-    if(t){ d.classList.add("num"); d.dataset.id = ids[i]; d.title = "끌어다 근거 칸에 놓기"; }
+    if(t){ d.classList.add("num"); d.dataset.id = ids[i]; d.title = "끌어다 정당화 칸에 놓기"; }
     if(i===cur) d.classList.add("cur");
     frag.appendChild(d);
   });
@@ -870,7 +870,7 @@ function endDrag(ev, cancel){
     const cell = justcol.querySelector('.jcell[data-id="' + lastJ.id + '"]');
     if(cell && cell.isContentEditable){ insertChip(cell, g.id, lastJ.range.startContainer.isConnected ? lastJ.range : null); return; }
   }
-  flash("근거 칸을 먼저 누르거나, 번호를 근거 칸으로 끌어다 놓으세요");
+  flash("정당화 칸을 먼저 누르거나, 번호를 정당화 칸으로 끌어다 놓으세요");
 }
 gutter.addEventListener("pointerup", ev=>endDrag(ev, false));
 gutter.addEventListener("pointercancel", ev=>endDrag(ev, true));
@@ -879,7 +879,7 @@ gutter.addEventListener("pointercancel", ev=>endDrag(ev, true));
 const JUST_WORDS = ["전제","가정","도입","제거","–"];
 const justGroup = document.createElement("div");
 justGroup.className = "group dock-just";
-justGroup.innerHTML = '<div class="group-label">근거 칸 전용</div><div class="group-keys"></div>';
+justGroup.innerHTML = '<div class="group-label">정당화 칸 전용</div><div class="group-keys"></div>';
 const dockJust = justGroup.querySelector(".group-keys");
 function insertJust(text){
   let cell = document.activeElement;
@@ -895,7 +895,7 @@ function insertJust(text){
 }
 JUST_WORDS.forEach(w=>{
   const b = document.createElement("button");
-  b.type = "button"; b.className = "k word"; b.textContent = w; b.setAttribute("aria-label", "근거에 " + w + " 넣기");
+  b.type = "button"; b.className = "k word"; b.textContent = w; b.setAttribute("aria-label", "정당화에 " + w + " 넣기");
   b.addEventListener("mousedown", e=>e.preventDefault());
   b.addEventListener("click", ()=>insertJust(w));
   dockJust.appendChild(b);
