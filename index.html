@@ -47,7 +47,8 @@ button:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outl
 button.warn{border-color:var(--accent);color:var(--accent)}
 
 .keys{display:flex;flex-wrap:wrap;gap:8px 14px;background:var(--sheet);border:1px solid var(--line);border-radius:8px;padding:10px}
-.dock{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--sheet);border-top:1px solid var(--line);padding:8px 16px calc(8px + env(safe-area-inset-bottom, 0px))}
+/* sticks to the bottom of the screen while the sheet runs below it; comes to rest right under the sheet */
+.dock{position:sticky;bottom:0;z-index:5;margin-top:-13px;background:var(--sheet);border:1px solid var(--line);border-radius:0 0 8px 8px;padding:8px 12px calc(8px + env(safe-area-inset-bottom, 0px));box-shadow:0 -4px 12px rgba(0,0,0,.06)}
 .dock-in{max-width:980px;margin:0 auto;display:flex;flex-wrap:wrap;gap:6px 14px}
 
 .k.word{font-family:var(--font-ui);font-size:12px;padding:0 9px}
@@ -166,6 +167,7 @@ textarea{flex:1;min-width:0;min-height:calc(var(--lh) * 16 + 28px);resize:none;b
     </div>
     <div class="toast" id="toast" role="status"></div>
   </div>
+  <div class="dock" id="dock" aria-label="자주 쓰는 기호"><div class="dock-in" id="dockIn"></div></div>
   <div class="hint">가정 열기: 가정선을 한 칸 더 긋고 가정 밑줄을 달아요. 가정을 쓰고 엔터를 치면 밑줄 아래로 넘어가요. · 엔터를 치면 가정선이 다음 줄에도 이어져요. · 가정 닫기: 가정선을 한 칸 빼요. 줄 맨 앞에서 ⌫를 눌러도 한 칸 빠져요. · 정당화: 왼쪽 줄 번호를 끌어다 오른쪽 정당화 칸에 놓으면 번호 칸이 들어가고, 그 뒤에 이어서 쓸 수 있어요. 정당화 칸을 먼저 누르고 줄 번호를 톡 눌러도 들어가요. 범위(3–10)는 줄 번호를 누른 채 번호 칸을 따라 위아래로 훑은 다음 정당화 칸으로 끌어오면 돼요. 번호 칸 바로 뒤에 "–"를 쓰고 다른 번호를 넣어도 범위로 합쳐져요. 줄을 넣거나 지우면 번호 칸의 숫자도 따라 바뀌어요. 번호 칸에 마우스를 올리거나 누르면 그 줄이 색칠돼요. 정당화 칸에서 엔터를 치면 다음 줄 정당화로 넘어가요. · 기호로 바뀐 직후 ⌫를 누르면 원래 글자로 돌아가요.</div>
 
   <section class="ref">
@@ -175,7 +177,6 @@ textarea{flex:1;min-width:0;min-height:calc(var(--lh) * 16 + 28px);resize:none;b
   </section>
 </div>
 
-<div class="dock" id="dock" aria-label="자주 쓰는 기호"><div class="dock-in" id="dockIn"></div></div>
 
 <script>
 const RULES = [
@@ -543,9 +544,7 @@ window.addEventListener("resize", render);
 const keysEl = document.getElementById("keys");
 const dockEl = document.getElementById("dockIn");
 const dock = document.getElementById("dock");
-function padForDock(){ document.body.style.paddingBottom = (dock.offsetHeight + 16) + "px"; }
-if(window.ResizeObserver) new ResizeObserver(padForDock).observe(dock);
-window.addEventListener("resize", padForDock);
+
 KEYS.forEach(([label, syms, where])=>{
   const g = document.createElement("div"); g.className="group";
   g.innerHTML = `<div class="group-label">${label}</div><div class="group-keys"></div>`;
