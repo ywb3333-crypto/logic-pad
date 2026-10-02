@@ -94,6 +94,10 @@ button.warn{border-color:var(--accent);color:var(--accent)}
 .gutter div.ref{background:var(--accent-soft);color:var(--accent);font-weight:500}
 .ghost{position:fixed;z-index:30;pointer-events:none;transform:translate(-50%,-120%);padding:2px 9px;border:1px solid var(--accent);border-radius:5px;background:var(--sheet);color:var(--accent);font-family:var(--font-pad);font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.18)}
 textarea{flex:1;min-width:0;min-height:calc(var(--lh) * 16 + 28px);resize:none;border:0;background:transparent;color:var(--ink);font-family:var(--font-pad);font-size:17px;line-height:var(--lh);padding:14px 16px;tab-size:4;white-space:pre;overflow-x:auto;overflow-y:hidden;box-sizing:border-box;border-radius:0}
+.defs{display:flex;align-items:flex-start;border-bottom:1px solid var(--line);background:var(--gutter)}
+.defs-label{flex:none;min-width:3.2em;padding:0 10px 0 8px;line-height:var(--lh);margin-top:8px;font-size:12px;letter-spacing:.06em;color:var(--accent);font-weight:500;text-align:right;border-right:1px solid var(--line);align-self:stretch}
+.defs textarea{min-height:calc(var(--lh) + 16px);padding:8px 16px;background:transparent}
+.defs textarea::placeholder{color:var(--muted);opacity:.7}
 .toast{position:absolute;right:12px;bottom:12px;background:var(--accent-soft);color:var(--ink);font-size:13px;padding:4px 10px;border-radius:5px;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.on{opacity:1}
 .hint{font-size:12px;color:var(--muted);padding:0 2px}
@@ -157,6 +161,10 @@ textarea{flex:1;min-width:0;min-height:calc(var(--lh) * 16 + 28px);resize:none;b
         <label class="toggle"><input type="checkbox" id="autoToggle" checked> 치는 대로 기호로 바꾸기</label>
       </div>
     </div>
+    <div class="defs">
+      <div class="defs-label">정의</div>
+      <textarea id="defs" rows="1" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="정의" placeholder="예) O^Z_x φ(y) :≡ W_x Z ∧ B_x(Z → φ(y)) ∧ B_x(◇φ(y) ∧ ◇¬φ(y))"></textarea>
+    </div>
     <div class="editor">
       <div class="gutter" id="gutter" aria-hidden="true"></div>
       <div class="main">
@@ -170,7 +178,7 @@ textarea{flex:1;min-width:0;min-height:calc(var(--lh) * 16 + 28px);resize:none;b
     <div class="toast" id="toast" role="status"></div>
   </div>
   <div class="dock" id="dock" aria-label="자주 쓰는 기호"><div class="dock-in" id="dockIn"></div></div>
-  <div class="hint">가정 열기: 가정선을 한 칸 더 긋고 가정 밑줄을 달아요. 가정을 쓰고 엔터를 치면 밑줄 아래로 넘어가요. · 엔터를 치면 가정선이 다음 줄에도 이어져요. · 가정 닫기: 가정선을 한 칸 빼요. 줄 맨 앞에서 ⌫를 눌러도 한 칸 빠져요. · 가지 나누기: ∨, ¬∧, → 처럼 가지가 갈리는 규칙을 쓸 줄에서 누르면 "가지 1", "가지 2" 칸이 아래로 이어서 생겨요. 가지 안에서 또 나누면 2.1, 2.2처럼 번호가 붙어요. 가지 닫기: ×를 넣고 다음 가지로 넘어가요. × 줄의 정당화 칸에 부딪힌 두 줄의 번호를 넣으세요. · ∧, ∨ 앞뒤 띄어쓰기는 그 줄을 벗어날 때(엔터, 다른 곳 누르기) 자동으로 맞춰져요. · 정당화: 왼쪽 줄 번호를 끌어다 오른쪽 정당화 칸에 놓으면 번호 칸이 들어가고, 그 뒤에 이어서 쓸 수 있어요. 정당화 칸을 먼저 누르고 줄 번호를 톡 눌러도 들어가요. 범위(3–10)는 줄 번호를 누른 채 번호 칸을 따라 위아래로 훑은 다음 정당화 칸으로 끌어오면 돼요. 번호 칸 바로 뒤에 "–"를 쓰고 다른 번호를 넣어도 범위로 합쳐져요. 줄을 넣거나 지우면 번호 칸의 숫자도 따라 바뀌어요. 번호 칸에 마우스를 올리거나 누르면 그 줄이 색칠돼요. 정당화 칸에서 엔터를 치면 다음 줄 정당화로 넘어가요. · 기호로 바뀐 직후 ⌫를 누르면 원래 글자로 돌아가요.</div>
+  <div class="hint">가정 열기: 가정선을 한 칸 더 긋고 가정 밑줄을 달아요. 가정을 쓰고 엔터를 치면 밑줄 아래로 넘어가요. · 엔터를 치면 가정선이 다음 줄에도 이어져요. · 가정 닫기: 가정선을 한 칸 빼요. 줄 맨 앞에서 ⌫를 눌러도 한 칸 빠져요. · 가지 나누기: ∨, ¬∧, → 처럼 가지가 갈리는 규칙을 쓸 줄에서 누르면 "가지 1", "가지 2" 칸이 아래로 이어서 생겨요. 가지 안에서 또 나누면 2.1, 2.2처럼 번호가 붙어요. 가지 닫기: ×를 넣고 다음 가지로 넘어가요. × 줄의 정당화 칸에 부딪힌 두 줄의 번호를 넣으세요. · ∧, ∨ 앞뒤 띄어쓰기는 그 줄을 벗어날 때(엔터, 다른 곳 누르기) 자동으로 맞춰져요. · 정당화: 왼쪽 줄 번호를 끌어다 오른쪽 정당화 칸에 놓으면 번호 칸이 들어가고, 그 뒤에 이어서 쓸 수 있어요. 정당화 칸을 먼저 누르고 줄 번호를 톡 눌러도 들어가요. 범위(3–10)는 줄 번호를 누른 채 번호 칸을 따라 위아래로 훑은 다음 정당화 칸으로 끌어오면 돼요. 번호 칸 바로 뒤에 "–"를 쓰고 다른 번호를 넣어도 범위로 합쳐져요. 줄을 넣거나 지우면 번호 칸의 숫자도 따라 바뀌어요. 번호 칸에 마우스를 올리거나 누르면 그 줄이 색칠돼요. 정당화 칸에서 엔터를 치면 다음 줄 정당화로 넘어가요. · 정의 칸: 전제 위에 번호 없이 정의를 적어 두는 곳이에요. 여러 줄 써도 되고, "==" 를 치면 ≡ 로 바뀌어요. 복사하면 맨 위에 "정의:" 로 같이 붙고, 붙여넣기로 다시 살아나요. · 기호로 바뀐 직후 ⌫를 누르면 원래 글자로 돌아가요.</div>
 
   <section class="ref">
     <h2>단축 입력</h2>
@@ -188,7 +196,7 @@ const RULES = [
   ["!|-","⊬","증명 안 됨"],["!|=","⊭","타당 아님"],["|-","⊢","증명"],["|=","⊨","함의·타당"],
   ["_|_","⊥","모순"],["!=","≠","같지 않음"],["\\G","Γ","감마"],["\\D","Δ","델타"],
   [":.","∴","그러므로"],["\\x","×","가지 닫힘"],["\\v","✓","체크"],["\\|","│","가정선"],
-  ["\\-","├─","가정 밑줄"]
+  ["\\-","├─","가정 밑줄"],["==","≡","정의상 같음"]
 ];
 const MATCH = [...RULES].sort((a,b)=>b[0].length-a[0].length);
 const SPACED = new Set(["∧","∨"]);
@@ -197,7 +205,7 @@ const KEYS = [
   ["연결사",["¬","∧","∨","→","↔","⊥"],"dock"],
   ["양상",["□","◇"]],
   ["양화·동일성",["∀","∃","=","≠"],"dock"],
-  ["메타",["⊢","⊨","⊬","⊭","Γ","Δ","∴"]],
+  ["메타",["≡","⊢","⊨","⊬","⊭","Γ","Δ","∴"]],
   ["타블로·증명",["×","✓","│","├─","─","|"]],
   ["아래첨자",["ₖ","ₜ","ᵦ","₄","₅","ₛ","ᵣ","ₑ"]]
 ];
@@ -212,6 +220,8 @@ const OLD_STORE = "logic-pad-draft-v2";
 const LH = 30;
 const hlEl = document.getElementById("hl");
 const justcol = document.getElementById("justcol");
+const defs = document.getElementById("defs");
+function fitDefs(){ defs.style.height = "auto"; defs.style.height = (defs.scrollHeight + (defs.offsetHeight - defs.clientHeight)) + "px"; }
 const SAMPLE_LINES = [
   ["∀x∀y(Rxy → Ryx)", ["전제"]],
   ["∀x∀y∀z(Rxy ∧ Ryz → Rxz)", ["전제"]],
@@ -378,10 +388,12 @@ function load(){
     }
   }
   prevArr = pad.value.split("\n");
+  try{ const d = localStorage.getItem(STORE+"-defs"); if(d !== null) defs.value = d; }catch(e){}
   try{ const s = localStorage.getItem(STORE+"-skip"); if(s!==null) skipBlank.checked = s==="1"; }catch(e){}
 }
 function save(){
   try{ localStorage.setItem(STORE, JSON.stringify({text:pad.value, ids, just, next:nextId})); }catch(e){}
+  try{ localStorage.setItem(STORE+"-defs", defs.value); }catch(e){}
 }
 function flash(msg){
   toast.textContent = msg; toast.classList.add("on");
@@ -391,6 +403,10 @@ function changed(){ prevLines = pad.value.split("\n").length; save(); render(); 
 
 function insert(text){
   const a = document.activeElement;
+  if(a === defs){
+    defs.setRangeText(text, defs.selectionStart, defs.selectionEnd, "end");
+    fitDefs(); save(); return;
+  }
   if(a && a.classList && a.classList.contains("jcell")){
     document.execCommand("insertText", false, text);
     readCell(a); save(); return;
@@ -611,7 +627,38 @@ pad.addEventListener("keydown", ev=>{
 pad.addEventListener("click", ()=>{ last = null; });
 pad.addEventListener("blur", ()=>{ if(lastLineId && tidyById(lastLineId)){ prevLines = pad.value.split("\n").length; save(); render(); } lastLineId = null; });
 skipBlank.addEventListener("change", ()=>{ try{ localStorage.setItem(STORE+"-skip", skipBlank.checked?"1":"0"); }catch(e){} render(); });
-window.addEventListener("resize", render);
+window.addEventListener("resize", ()=>{ render(); fitDefs(); });
+
+/* ---------- definitions box ---------- */
+let defsLast = null;
+defs.addEventListener("input", ev=>{
+  defsLast = null;
+  if(auto.checked && !ev.isComposing && ev.inputType && ev.inputType.startsWith("insert") && defs.selectionStart === defs.selectionEnd){
+    const pos = defs.selectionStart, before = defs.value.slice(0, pos);
+    for(const [from,to] of MATCH){
+      if(before.endsWith(from)){
+        const start = pos - from.length;
+        defs.setRangeText(to, start, pos, "end");
+        defsLast = {start, from, to};
+        break;
+      }
+    }
+  }
+  fitDefs(); save();
+});
+defs.addEventListener("keydown", ev=>{
+  if(ev.isComposing) return;
+  if(ev.key === "Backspace" && defsLast){
+    const end = defsLast.start + defsLast.to.length;
+    if(defs.selectionStart === end && defs.selectionEnd === end && defs.value.slice(defsLast.start, end) === defsLast.to){
+      ev.preventDefault();
+      defs.setRangeText(defsLast.from, defsLast.start, end, "end");
+      defsLast = null; fitDefs(); save(); return;
+    }
+  }
+  if(ev.key.length !== 1 && ev.key !== "Backspace") defsLast = null;
+});
+defs.addEventListener("click", ()=>{ defsLast = null; });
 
 /* ---------- keys + reference ---------- */
 const keysEl = document.getElementById("keys");
@@ -680,12 +727,17 @@ function numberedText(){
   const FIG = "\u2007", PUNC = "\u2008";
   const dw = Math.max(...nums.map(n=>n.length), 1);
   const fw = Math.max(...lines.map(l=>[...l].length), 0);
-  return lines.map((l,i)=>{
+  const head = defsHead();
+  return head + lines.map((l,i)=>{
     const tag = nums[i] ? nums[i] + "." + FIG.repeat(dw - nums[i].length) + "  " : FIG.repeat(dw) + PUNC + "  ";
     const j = justText(ids[i], labels);
     const body = j ? l + " ".repeat(fw - [...l].length) + "    " + j : l;
     return (tag + " " + body).trimEnd();
   }).join("\n");
+}
+function defsHead(){
+  const d = defs.value.replace(/\s+$/, "");
+  return d ? "정의:\n" + d.split("\n").map(l=>"  " + l).join("\n") + "\n\n" : "";
 }
 function copy(text){
   const fallback = ()=>{ pad.focus(); pad.select(); flash("전체 선택됨 · 길게 눌러 복사하세요"); };
@@ -696,7 +748,7 @@ function copy(text){
   }catch(e){ fallback(); }
 }
 document.getElementById("copyNumBtn").addEventListener("click", ()=>copy(numberedText()));
-document.getElementById("copyBtn").addEventListener("click", ()=>copy(pad.value));
+document.getElementById("copyBtn").addEventListener("click", ()=>copy(defsHead() + pad.value));
 
 const clearBtn = document.getElementById("clearBtn");
 let armed = false;
@@ -707,7 +759,7 @@ clearBtn.addEventListener("click", ()=>{
     return;
   }
   armed = false; clearBtn.textContent="비우기"; clearBtn.classList.remove("warn");
-  pad.value = ""; just = {}; last = null; pad.focus(); changed(); flash("비웠어요");
+  pad.value = ""; defs.value = ""; fitDefs(); just = {}; last = null; pad.focus(); changed(); flash("비웠어요");
 });
 
 /* ---------- justification cells ---------- */
@@ -980,7 +1032,16 @@ document.addEventListener("focusin", ev=>{
 });
 
 /* ---------- paste numbered text back in ---------- */
+function splitDefs(text){
+  const raw = text.replace(/\r/g, "").replace(/^\n+/, "").split("\n");
+  if(!/^\s*정의\s*:?\s*$/.test(raw[0] || "")) return {defs:null, rest:raw.join("\n")};
+  let i = 1; const out = [];
+  while(i < raw.length && !/^\s*\d+\.\s/.test(raw[i]) && !(raw[i].trim() === "" && /^\s*\d+\.\s/.test(raw[i+1] || ""))){ out.push(raw[i].replace(/^ {2}/, "")); i++; }
+  while(i < raw.length && raw[i].trim() === "") i++;
+  return {defs: out.join("\n").replace(/\s+$/, ""), rest: raw.slice(i).join("\n")};
+}
 function parseNumbered(text){
+  const sd = splitDefs(text); text = sd.rest;
   const raw = text.replace(/\r/g, "").replace(/\n+$/, "").split("\n");
   const numbered = raw.filter(l=>/^\s*\d+\.\s/.test(l)).length;
   if(numbered < 1) return null;
@@ -997,7 +1058,7 @@ function parseNumbered(text){
     if(mm && /^[\d가-힣]/.test(mm[2])){ body = mm[1]; j = mm[2].trim(); }
     lines.push(body.replace(/\s+$/, "")); justs.push(j);
   }
-  return {lines, justs, labels};
+  return {lines, justs, labels, defs: sd.defs};
 }
 function tokenizeJust(j, idOf){
   const out = [];
@@ -1017,6 +1078,7 @@ function applyParsed(p, mode){
   const baseLines = mode === "append" && pad.value.trim() !== "" ? pad.value.split("\n") : [];
   const baseIds = baseLines.length ? ids.slice() : [];
   if(!baseLines.length) just = {};
+  if(p.defs){ defs.value = baseLines.length && defs.value.trim() ? defs.value.replace(/\s+$/, "") + "\n" + p.defs : p.defs; fitDefs(); }
   const newIds = p.lines.map(()=>newId());
   const byLabel = {};
   p.labels.forEach((lab,i)=>{ if(lab) byLabel[lab] = newIds[i]; });
@@ -1048,7 +1110,9 @@ pasteBox.addEventListener("input", ()=>{ pasteErr.textContent = ""; });
 /* pasting numbered text straight into the sheet works too */
 pad.addEventListener("paste", ev=>{
   const t = ev.clipboardData && ev.clipboardData.getData("text/plain");
-  if(!t || t.split("\n").filter(l=>/^\s*\d+\.\s/.test(l)).length < 2) return;
+  if(!t) return;
+  const nn = t.split("\n").filter(l=>/^\s*\d+\.\s/.test(l)).length;
+  if(nn < 2 && !(nn >= 1 && /^\s*정의\s*:?\s*\n/.test(t))) return;
   const p = parseNumbered(t);
   if(!p) return;
   ev.preventDefault();
@@ -1105,6 +1169,7 @@ resizer.addEventListener("dblclick", ()=>{
 load();
 prevLines = pad.value.split("\n").length;
 render();
+fitDefs();
 if(document.fonts && document.fonts.ready) document.fonts.ready.then(render);
 </script>
 
